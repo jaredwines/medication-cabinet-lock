@@ -16,10 +16,9 @@ byte colPins[COLS] = {9, 8, 7, 6}; //connect to the column pinouts of the keypad
 
 Keypad keypad = Keypad( makeKeymap(keys), rowPins, colPins, ROWS, COLS );
 String password = "0000";
-String tempPassword = "";
 String input = "";
-bool  resetPass = false;
-bool  resetPassCheck = false;
+bool  resetPassword = false;
+bool  passwordCheck = false;
 void setup() {
   Serial.begin(9600);
   // set  the transistor pin as output:
@@ -30,7 +29,7 @@ void loop()
 {
   char key = keypad.getKey();
 
-  if (!resetPass && num_0_to_9(key))
+  if (!resetPassword && containsDigit(key))
   {
     input = input + key;
     Serial.print("\n" + input);
@@ -39,54 +38,54 @@ void loop()
       Serial.print("\nValid Password. Safe is now unlocked.");
       input = "";
     }
-    else if (!vaildInputSize(input))
+    else if (vaildInputSize(input))
     {
       Serial.print("\nInvalid Password!");
       input = "";
     }
   }
 
-  else if (!resetPass && key == '*')
+  else if (!resetPassword && key == '*')
   {
-    resetPass = true;
+    resetPassword = true;
     input = "";
     Serial.print("\nPASSWORD RESET");
     Serial.print("\nEnter current password.");
   }
 
-  if (resetPass && !resetPassCheck && num_0_to_9(key))
+  if (resetPassword && !passwordCheck && containsDigit(key))
   {
     input = input + key;
     Serial.print("\n" + input);
     if (vaildPassword(input))
     {
       Serial.print("\nValid Password. Please enter new password.");
-      resetPassCheck = true;
+      passwordCheck = true;
       input = "";
     }
-    else if (!vaildInputSize(input))
+    else if (vaildInputSize(input))
     {
       Serial.print("\nInvalid Password! Password reset failed!");
-      resetPass = false;
+      resetPassword = false;
       input = "";
     }
   }
 
-  else if (resetPass && resetPassCheck && num_0_to_9(key))
+  else if (resetPassword && passwordCheck && containsDigit(key))
   {
     input = input + key;
     Serial.print("\n" + input);
-    if (!vaildInputSize(input))
+    if (vaildInputSize(input))
     {
       password = input;
       Serial.print("\nNew Password: " + input);
-      resetPass = false;
+      resetPassword = false;
       input = "";
     }
   }
 }
 
-bool num_0_to_9(char keyChar)
+bool containsDigit(char keyChar)
 {
   if (keyChar == '0' || keyChar == '1' || keyChar == '2' || keyChar == '3' || keyChar == '4' || keyChar == '5' || keyChar == '6' || keyChar == '7' || keyChar == '8' || keyChar == '9')
   {
@@ -112,13 +111,13 @@ bool vaildPassword(String inputStr)
 
 bool vaildInputSize(String inputStr)
 {
-  if (inputStr.length() > 3)
+  if (inputStr.length() == 4)
   {
-    return false;
+    return true;
   }
   else
   {
-    return true;
+    return false;
   }
 }
 
