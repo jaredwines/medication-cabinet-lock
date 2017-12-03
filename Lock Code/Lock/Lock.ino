@@ -2,18 +2,22 @@
 #include <IRremote.h>
 #include <SPI.h>
 #include <RFID.h>
+#include <Wire.h>
+#include <LiquidCrystal_I2C.h>
 
-const int LOCK_PIN = A3;    // connected to the base of the transistor
+LiquidCrystal_I2C lcd(0x3F, 2, 1, 0, 4, 5, 6, 7, 3, POSITIVE);
+
+const int LOCK_PIN = A0;    // connected to the base of the transistor
 
 /* Define the DIO used for the SDA (SS) and RST (reset) pins. */
 #define SDA_DIO 10
-#define RESET_DIO A4
+#define RESET_DIO A1
 /* Create an instance of the RFID library */
 RFID RC522(SDA_DIO, RESET_DIO);
 
 char bluetoothData = 0;
 
-int RECV_PIN = A5;
+int RECV_PIN = A2;
 IRrecv irrecv(RECV_PIN);
 decode_results results;
 
@@ -42,6 +46,9 @@ void setup() {
   irrecv.enableIRIn(); // Start the receiver
   SPI.begin(); //Enable the SPI interface
   RC522.init(); //Initialise the RFID reader
+  lcd.begin(16, 2);
+  lcd.setCursor(0, 1);
+  lcd.clear();
 }
 
 void loop()
@@ -61,16 +68,30 @@ void loop()
   if (!resetPassword && isDigit(key))
   {
     input = input + key;
-    Serial.print("\n" + input);
+    Serial.print(input);
+    lcd.clear();
+    lcd.setCursor(0, 1);
+    lcd.print(input);
     if (vaildPassword(input))
     {
+      delay(500);
       Serial.print("\nValid Password. Safe is now unlocked.");
+      lcd.clear();
+      lcd.print("Valid Password. Safe is now unlocked.");
+      delay(100);
       unlock();
+      delay(900);
       input = "";
+      lcd.clear();
     }
     else if (vaildInputSize(input))
     {
+      delay(500);
       Serial.print("\nInvalid Password!");
+      lcd.clear();
+      lcd.print("Invalid Password!");
+      delay(1000);
+      lcd.clear();
       input = "";
     }
   }
@@ -80,22 +101,39 @@ void loop()
     resetPassword = true;
     input = "";
     Serial.print("\nPASSWORD RESET");
-    Serial.print("\nEnter current password.");
+    lcd.clear();
+    lcd.print("PASSWORD RESET");
+    delay(1000);
+    Serial.print("\nCurrent password.");
+    lcd.clear();
+    lcd.print("Current password");
   }
 
   if (resetPassword && !passwordCheck && isDigit(key))
   {
     input = input + key;
     Serial.print("\n" + input);
+    lcd.clear();
+    lcd.print(input);
     if (vaildPassword(input))
     {
+      delay(500);
       Serial.print("\nValid Password. Please enter new password.");
+      lcd.clear();
+      lcd.print("Valid Password. Please enter new password.");
+      delay(1000);
+      lcd.clear();
       passwordCheck = true;
       input = "";
     }
     else if (vaildInputSize(input))
     {
+      delay(500);
       Serial.print("\nInvalid Password! Password reset failed!");
+      lcd.clear();
+      lcd.print("Invalid Password! Password reset failed!");
+      delay(1000);
+      lcd.clear();
       resetPassword = false;
       input = "";
     }
@@ -104,11 +142,18 @@ void loop()
   else if (resetPassword && passwordCheck && isDigit(key))
   {
     input = input + key;
-    Serial.print("\n" + input);
+    Serial.print(input);
+    lcd.clear();
+    lcd.print(input);
     if (vaildInputSize(input))
     {
+      delay(500);
       password = input;
       Serial.print("\nNew Password: " + input);
+      lcd.clear();
+      lcd.print("New Password: " + input);
+      delay(1000);
+      lcd.clear();
       resetPassword = false;
       passwordCheck = false;
       input = "";
