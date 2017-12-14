@@ -47,7 +47,7 @@ void setup() {
   SPI.begin(); //Enable the SPI interface
   RC522.init(); //Initialise the RFID reader
   lcd.begin(16, 2);
-  lcd.setCursor(0, 1);
+  lcd.setCursor(0, 0);
   lcd.clear();
 }
 
@@ -70,17 +70,18 @@ void loop()
     input = input + key;
     Serial.print(input);
     lcd.clear();
-    lcd.setCursor(0, 1);
+    lcd.setCursor(0, 0);
     lcd.print(input);
     if (vaildPassword(input))
     {
       delay(500);
       Serial.print("\nValid Password. Safe is now unlocked.");
       lcd.clear();
-      lcd.print("Valid Password. Safe is now unlocked.");
-      delay(100);
+      lcd.setCursor(0, 1);
+      lcd.print("Safe unlocked.");
+      lcd.setCursor(0, 0);
+      lcd.print("Valid Password.");
       unlock();
-      delay(900);
       input = "";
       lcd.clear();
     }
@@ -89,8 +90,8 @@ void loop()
       delay(500);
       Serial.print("\nInvalid Password!");
       lcd.clear();
-      lcd.print("Invalid Password!");
-      delay(1000);
+      lcd.print("Invalid Password");
+      delay(1500);
       lcd.clear();
       input = "";
     }
@@ -102,11 +103,17 @@ void loop()
     input = "";
     Serial.print("\nPASSWORD RESET");
     lcd.clear();
+     lcd.setCursor(0, 1);
+    lcd.print("MODE");
+    lcd.setCursor(0, 0);
     lcd.print("PASSWORD RESET");
     delay(1000);
     Serial.print("\nCurrent password.");
     lcd.clear();
-    lcd.print("Current password");
+    lcd.setCursor(0, 1);
+    lcd.print("password.");
+    lcd.setCursor(0, 0);
+    lcd.print("Enter current");
   }
 
   if (resetPassword && !passwordCheck && isDigit(key))
@@ -120,9 +127,13 @@ void loop()
       delay(500);
       Serial.print("\nValid Password. Please enter new password.");
       lcd.clear();
-      lcd.print("Valid Password. Please enter new password.");
-      delay(1000);
+      lcd.print("Valid Password");
+      delay(800);
       lcd.clear();
+      lcd.setCursor(0, 1);
+      lcd.print("password.");
+      lcd.setCursor(0, 0);
+      lcd.print("Enter new");
       passwordCheck = true;
       input = "";
     }
@@ -131,8 +142,14 @@ void loop()
       delay(500);
       Serial.print("\nInvalid Password! Password reset failed!");
       lcd.clear();
-      lcd.print("Invalid Password! Password reset failed!");
-      delay(1000);
+      lcd.print("Invalid Password");
+      delay(800);
+      lcd.clear();
+      lcd.setCursor(0, 1);
+      lcd.print("failed!");
+      lcd.setCursor(0, 0);
+      lcd.print("Password reset");
+      delay(1500);
       lcd.clear();
       resetPassword = false;
       input = "";
@@ -151,8 +168,11 @@ void loop()
       password = input;
       Serial.print("\nNew Password: " + input);
       lcd.clear();
-      lcd.print("New Password: " + input);
-      delay(1000);
+      lcd.setCursor(0, 1);
+      lcd.print(input);
+      lcd.setCursor(0, 0);
+      lcd.print("New Password");
+      delay(1500);
       lcd.clear();
       resetPassword = false;
       passwordCheck = false;
@@ -188,37 +208,37 @@ bool vaildInputSize(String inputStr)
 void receiveIRInput ()
 {
   if (irrecv.decode(&results)) {
-    if (results.value == 0x20DF08F7) {
+    if (results.value == 0x373119) {
       key = '0';
     }
-    else if (results.value == 0x20DF8877) {
+    else if (results.value == 0x36113D) {
       key = '1';
     }
-    else if (results.value == 0x20DF48B7) {
+    else if (results.value == 0x37111D) {
       key = '2';
     }
-    else if (results.value == 0x20DFC837) {
+    else if (results.value == 0x36912D) {
       key = '3';
     }
-    else if (results.value == 0x20DF28D7) {
+    else if (results.value == 0x37910D) {
       key = '4';
     }
-    else if (results.value == 0x20DFA857) {
+    else if (results.value == 0x365135) {
       key = '5';
     }
-    else if (results.value == 0x20DF6897) {
+    else if (results.value == 0x375115) {
       key = '6';
     }
-    else if (results.value == 0x20DFE817) {
+    else if (results.value == 0x36D125) {
       key = '7';
     }
-    else if (results.value == 0x20DF18E7) {
+    else if (results.value == 0x37D105) {
       key = '8';
     }
-    else if (results.value == 0x20DF9867) {
+    else if (results.value == 0x363139) {
       key = '9';
     }
-    else if (results.value == 0x20DF22DD) {
+    else if (results.value == 0x366133) {
       key = '*';
     }
     delay(100);
@@ -275,7 +295,12 @@ void receiveRFIDInput()
     if (serialNumRFID == "8010115163138")
     {
       Serial.print("\nValid Card. Safe is now unlocked.");
+      lcd.setCursor(0, 1);
+      lcd.print("Safe unlocked.");
+      lcd.setCursor(0, 0);
+      lcd.print("Valid Card.");
       unlock();
+      lcd.clear();
     }
     serialNumRFID = ""; //Clear serialNumRFID for the next RFID card.
   }
@@ -284,7 +309,6 @@ void receiveRFIDInput()
 void unlock()
 {
   digitalWrite(LOCK_PIN, HIGH);   // turn the LED on (HIGH is the voltage level)
-  delay(3000);                       // wait for a second
+  delay(4300);                       // wait for a second
   digitalWrite(LOCK_PIN, LOW);    // turn the LED off by making the voltage LOW
 }
-
