@@ -5,6 +5,7 @@
 #include <Wire.h>
 #include <LiquidCrystal_I2C.h>
 
+//Setting to setup the LCD Screen
 LiquidCrystal_I2C lcd(0x3F, 2, 1, 0, 4, 5, 6, 7, 3, POSITIVE);
 
 const int LOCK_PIN = A0;    // connected to the base of the transistor
@@ -15,12 +16,14 @@ const int LOCK_PIN = A0;    // connected to the base of the transistor
 /* Create an instance of the RFID library */
 RFID RC522(SDA_DIO, RESET_DIO);
 
-char bluetoothData = 0;
+char bluetoothData = 0; //The bluetoothData store the bluetooth data
 
+//Settings to setup the IR Receiver
 int RECV_PIN = A2;
 IRrecv irrecv(RECV_PIN);
 decode_results results;
 
+//Settings to setup the Keypad
 const byte ROWS = 4; //four rows
 const byte COLS = 4; //four columns
 char keys[ROWS][COLS] = {
@@ -53,18 +56,19 @@ void setup() {
 
 void loop()
 {
-  //Key Pad Code
-  receiveKeyPadInput();
-
-  //RFID Reciever Code
+  // receieves the input from RFID read and if it is corrent than unlock safe.
   receiveRFIDInput();
 
-  //IR Reciever Code
+  // receieves the input from key and stores into key.
+  receiveKeyPadInput();
+
+  // receieves the input from IR and stores into key.
   receiveIRInput();
 
-  //Bluetooth Reiever Code
+  // receieves the input from bluetooth key and stores into key.
   receiveBluetoothInput();
 
+  //The mode where it takes the user input inorder to determine to unlock the safe
   if (!resetPassword && isDigit(key))
   {
     input = input + key;
@@ -72,19 +76,21 @@ void loop()
     lcd.clear();
     lcd.setCursor(0, 0);
     lcd.print(input);
+    //If the user input is valid than unlock the safe
     if (vaildPassword(input))
     {
       delay(500);
       Serial.print("\nValid Password. Safe is now unlocked.");
       lcd.clear();
       lcd.setCursor(0, 1);
-      lcd.print("Safe unlocked.");
+      lcd.print("safe unlocked.");
       lcd.setCursor(0, 0);
-      lcd.print("Valid Password.");
+      lcd.print("Valid Password,");
       unlock();
       input = "";
       lcd.clear();
     }
+    //if the user input is wrong than clear input
     else if (vaildInputSize(input))
     {
       delay(500);
@@ -97,6 +103,7 @@ void loop()
     }
   }
 
+  //Enter reset mode with key is '*'
   else if (!resetPassword && key == '*')
   {
     resetPassword = true;
@@ -116,12 +123,15 @@ void loop()
     lcd.print("Enter current");
   }
 
+  //Checks the user input when in reset mode
   if (resetPassword && !passwordCheck && isDigit(key))
   {
     input = input + key;
     Serial.print("\n" + input);
     lcd.clear();
     lcd.print(input);
+    //if the password is corrent while in reset mode than
+    //allow the user to enter a new password
     if (vaildPassword(input))
     {
       delay(500);
@@ -137,6 +147,7 @@ void loop()
       passwordCheck = true;
       input = "";
     }
+    //If the password is incorrent than exit the reset mode.
     else if (vaildInputSize(input))
     {
       delay(500);
@@ -155,7 +166,7 @@ void loop()
       input = "";
     }
   }
-
+  //Check user input and than makes the input the new password
   else if (resetPassword && passwordCheck && isDigit(key))
   {
     input = input + key;
@@ -171,7 +182,7 @@ void loop()
       lcd.setCursor(0, 1);
       lcd.print(input);
       lcd.setCursor(0, 0);
-      lcd.print("New Password");
+      lcd.print("New Password:");
       delay(1500);
       lcd.clear();
       resetPassword = false;
@@ -182,6 +193,7 @@ void loop()
   key = ' ';  //clear key for next input
 }
 
+//Check the user input if it matches the password.
 bool vaildPassword(String inputStr)
 {
   if (inputStr == password)
@@ -194,6 +206,7 @@ bool vaildPassword(String inputStr)
   }
 }
 
+//Check if the input is the correct length of 4 characters
 bool vaildInputSize(String inputStr)
 {
   if (inputStr.length() == 4)
@@ -205,6 +218,8 @@ bool vaildInputSize(String inputStr)
     return false;
   }
 }
+
+//Check the ir code and sets it to the respective number
 void receiveIRInput ()
 {
   if (irrecv.decode(&results)) {
@@ -246,6 +261,7 @@ void receiveIRInput ()
   }
 }
 
+//get the input for the
 void receiveKeyPadInput()
 {
   key = keypad.getKey();
@@ -281,6 +297,7 @@ void receiveBluetoothInput()
   }
 }
 
+//Checks the serial of the RFID card and if it matchs the password than unlock the safe
 void receiveRFIDInput()
 {
   /* Has a card been detected? */
@@ -292,13 +309,14 @@ void receiveRFIDInput()
     {
       serialNumRFID += RC522.serNum[i], DEC;
     }
+    //If the serial number matches the password then unlock
     if (serialNumRFID == "8010115163138")
     {
       Serial.print("\nValid Card. Safe is now unlocked.");
       lcd.setCursor(0, 1);
-      lcd.print("Safe unlocked.");
+      lcd.print("safe unlocked.");
       lcd.setCursor(0, 0);
-      lcd.print("Valid Card.");
+      lcd.print("Valid Card,");
       unlock();
       lcd.clear();
     }
@@ -306,6 +324,7 @@ void receiveRFIDInput()
   }
 }
 
+//unlocks the safe
 void unlock()
 {
   digitalWrite(LOCK_PIN, HIGH);   // turn the LED on (HIGH is the voltage level)
