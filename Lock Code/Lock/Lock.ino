@@ -103,11 +103,11 @@ void loop()
     input = "";
     Serial.print("\nPASSWORD RESET");
     lcd.clear();
-     lcd.setCursor(0, 1);
+    lcd.setCursor(0, 1);
     lcd.print("MODE");
     lcd.setCursor(0, 0);
     lcd.print("PASSWORD RESET");
-    delay(1000);
+    delay(1500);
     Serial.print("\nCurrent password.");
     lcd.clear();
     lcd.setCursor(0, 1);
@@ -128,7 +128,7 @@ void loop()
       Serial.print("\nValid Password. Please enter new password.");
       lcd.clear();
       lcd.print("Valid Password");
-      delay(800);
+      delay(1500);
       lcd.clear();
       lcd.setCursor(0, 1);
       lcd.print("password.");
@@ -143,13 +143,13 @@ void loop()
       Serial.print("\nInvalid Password! Password reset failed!");
       lcd.clear();
       lcd.print("Invalid Password");
-      delay(800);
+      delay(1500);
       lcd.clear();
       lcd.setCursor(0, 1);
       lcd.print("failed!");
       lcd.setCursor(0, 0);
       lcd.print("Password reset");
-      delay(1500);
+      delay(2000);
       lcd.clear();
       resetPassword = false;
       input = "";
