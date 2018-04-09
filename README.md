@@ -8,11 +8,11 @@ password. The second way is by swiping a magnetic card. The third way is by usin
 receiver. The fourth way is by using Bluetooth with an application. The purpose of the medicine
 cabinet is to keep the medicine in a safe place and this will provide people more privacy.
 
-## Flowchart on how it works
+## How It Works
 
 ![flowchart](https://gdurl.com/Iu6Y)
 
-## Schematics for Medication Cabinet Lock
+## Schematics
 
 ![schematics](https://gdurl.com/W8Ev)
 
