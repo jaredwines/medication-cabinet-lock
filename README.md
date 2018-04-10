@@ -19,3 +19,8 @@ cabinet is to keep the medicine in a safe place and this will provide people mor
 ## Picture of Medication Cabinet Lock
 
 ![medication-cabinet-lock](https://gdurl.com/OONH)
+
+## Contributors
+
+[Cynthia Valdovinos](https://github.com/CynthiaIreri)
+
